@@ -1,0 +1,70 @@
+//---------------
+All the packages that you would be downloading from the npm website , check that it shouldn’t be more than 2 years old and there are a good number of weekly downloads to make sure that it is updated regularly.
+By doing this, we are preventing any issues/vulnerabilities that might cause because of the older version when we are working in a real world scenario.
+
+High risk npm packages that you should be using carefully during real world scenarios are with Input Output operations (I/O operations), is it writing or reading from my file system, is it interacting with the user or is it collecting informa from the user 
+Make sure if it is doing any I/O operation, try to go no less then a year for such packages
+
+
+
+//---------------
+When we create a package.json file 
+1) When naming the file we use common JS naming convention - no spaces, using dashes or capital letter
+We can use underscores and @ symbol but not a good practice
+2) for test: jest
+This command basically tells us how are we going to test the file 
+One example we are going to use in JavaScript Frameworks is jest
+3) The license question is set to ISC by default which means that do what you want with the package
+
+
+
+//-----------------------
+- To get data from packages through npm, there are two methods - import (newer version, ECMAScript) and require (older version, common JS) 
+- A project that is ECMAScript can be imported to an ECMAScript project, however a project that is commonJS cannot import an ECMAScript app
+- Recommended to use import as React uses import statements and not require statements 
+
+
+
+
+//----------IMPORTING AND USING REQUIRE to export the package----------
+//Using require
+const express = require("express");
+
+//Using import - GOOD PRACTICE 
+import express from "express";
+
+
+
+
+
+
+//------------LET AND VAR------------
+//It is recommended to use let only if you know the value in that variable is going to change, otherwise stick to const
+//use const as much as possible
+
+
+
+
+
+//---------nodemon-----------
+//We don't want nodemon package on the deployed version of the website
+//We only need it when we are working locally in computer/ making the project
+//We need nodemon locally - npm i nodemon -D //-- This will save it as a development dependency
+//Anything that is required only for local development gets installed as dev dependency
+
+//When deploying our code we need to make sure and distinguish what is development dependency and what is production dependency
+//Express is a production dependency and nodemon is a development dependency
+
+
+//Whenever we are downloading nodemon locally, we need to make sure that we add "dev" : "nodemon index" in the script object for it to work
+//This can be prevented by downloading nodemon globally but it is not a good practice
+//and now to run the file using nodemon we just write npm run dev in the terminal - dev is the object we created in the package.json file
+//Whatever we write in the dev object is the same as we write to run the file using nodemon if it was downloaded globally, if that makes sense
+
+
+
+
+
+//-----------ENV-------------
+dotenv is a package that help us dealing with environment variables
+//Environment variables are used to configure various aspects of your application, such as API keys, database connections, and other settings that may change between development and production environments.
