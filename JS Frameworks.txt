@@ -1,3 +1,35 @@
+//Packages that we have installed for this project
+- nodemon
+- express
+- dotenv
+- eslint - a code formatter and also helps you tell that when you are using potential vulnerabilities  //Stupid powerful when used with typescript
+- ejs 
+
+//Test driven dependency
+- jest : writing test
+- supertest - used to fake http request
+//npm i -D jest supertest - This helps us to downloaded both the dependency at the same time
+//-D is the flag used to indicate that it is a dependency
+
+
+
+
+
+//We are creating an ECMAScript app(esm app) because we are using import export statement and not a commonjs app(which is the default) where require is used
+//Hence, we need tell jest that we are creating an esm app and not the default one that is (commonjs)
+//In order to set that up we have created jest.config.js - most companies have this setup in their projects and if not it is easy to set up by just googling "how do i set up tests on an esm app using ____"
+
+
+//We changed "test": "jest" in package.json to "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js --no-cache",
+//We need to change that because we are turning on the experimental mode so it can support ECMAScript
+
+
+//Difference between esm and commonJS - read online and worth the read 
+//Why we choose esm - top reason being because that's what industry is using
+
+
+
+
 //---------------
 All the packages that you would be downloading from the npm website , check that it shouldn’t be more than 2 years old and there are a good number of weekly downloads to make sure that it is updated regularly.
 By doing this, we are preventing any issues/vulnerabilities that might cause because of the older version when we are working in a real world scenario.
@@ -68,3 +100,80 @@ import express from "express";
 //-----------ENV-------------
 dotenv is a package that help us dealing with environment variables
 //Environment variables are used to configure various aspects of your application, such as API keys, database connections, and other settings that may change between development and production environments.
+
+
+
+
+
+//Error codes
+//200 - success
+//404 - Not found
+//201 - for resource creation
+//500 - server error
+//204  - No content (but was successful)
+
+
+
+
+//In ReSTful API , every route has to have HTTP methods associated with them.
+//There is PATCH and PUT to update the data - but it recommended to use PUT instead of PATCH
+
+
+
+
+app.get("/", (req, res, next) => {
+    res.send("Boorakacha!");
+});
+//Request - plugin the request object
+//Response - plugin the response object(Our ability to give the response back to the user)
+//Next - function which allows you to go to the next middleware or controller if needed
+//The next keyword that is used in the callback is a way to say to move on to the next middleware
+//Middleware move through each other through the order they are defined in - and it will keep moving until our error handler middleware
+
+
+
+
+//-------------ESLint------------
+ESLint is a tool used by developers to help keep their JavaScript code clean, consistent, and error-free. It checks your code for common mistakes, enforces coding styles, and highlights potential issues. It does this by analyzing your code and applying a set of rules defined either by you or by your team.
+When you run ESLint on your code, it gives you feedback on where you might have made mistakes or deviated from your chosen coding standards, helping you write better code overall.
+
+In this project - just like how we make a package.json file using npm init 
+//We use npx eslint --init to create .eslintrc.js configuration file
+
+
+
+
+
+
+
+
+//-------------------TTD (Test Driven Development)------------------------------
+//There are different type of testing done before our application is set for production
+//1) Integration testing  : Turn my server on but automate request directly to those endpoints and then check whether I am getting expected output or not
+//2) Unit testing (most common)  : Doesn't run the server - Instead of using the real database and services, live request and fetching real data - we mock it 
+//3) Functional testing (used when testing a library/API)   : Testing a singular function - I am giving the input that it requires and testing the output to see if the output is as expected
+
+//TTD (Test Driven development) can be written in two ways :
+//1. Write code first then test code
+//2. Write tests first then write code (proper way) -- What we are doing in this project
+
+//tests folder mimics our application structure
+//When we run supertest and mock our request, we don't want our server to run because of app.listen
+//So we add app.setup() in app.js and to run the application we use index.js
+//Hence, app.js is setting up the setup and index.js is running the application
+
+
+
+
+//To run the test - we use npm run test in the terminal
+
+
+
+
+
+
+
+
+//Resource pages - Resource pages/routes are those pages that uses(access the data and pull back some data) the data from the database
+//Static page - Doesn't collect any data/interaction with database
+//Here, what we are doing is that all the static pages - we are going to put in the controllers folder in the test folder
