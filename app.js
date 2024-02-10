@@ -1,17 +1,13 @@
 import express from "express";
-import PageRoutes from "./routes/PagesRoutes.js";
-import CardRoutes from "./routes/CardRoutes.js";
 import dotenv from 'dotenv';
-import mongoose from "mongoose";
+import RoutesSetup from "./lib/RoutesSetup.js";
+import MongooseSetup from "./lib/MongooseSetup.js";
+import PassportSetup from "./lib/PassportSetup.js";
+import session from "express-session";
 
 dotenv.config();
 
-//Connect to Mongo using Mongoose
-mongoose.connect(`mongodb+srv://${process.env.MONGO_USER}:${process.env.MONGO_PASSWORD}@${process.env.MONGO_DATABASE}.gzib7wp.mongodb.net/?retryWrites=true&w=majority`)
-    .then(() => {
-        console.log("Connected to MongoDB");
-    })
-    .catch(error => console.error(error));
+MongooseSetup()
 
 const app = express();
 //We need to assign the environment variable to a normal variable in our application
@@ -25,6 +21,20 @@ const app = express();
 //Middlewares will always be executed in an order
 //GET - clicks a link, url is typed and visited
 //POST - form is submitted
+
+// Setup sessions
+app.use(session({
+    secret: process.env.SECRET_KEY,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        httpOnly: true,
+        secure: (process.env.NODE_ENV === "production"),
+        sameSite: (process.env.NODE_ENV === "production" ? "strict" : "lax")
+    }
+}));
+
+PassportSetup(app); //This function sets up passport with all its strategies (local signup & login)
 
 //Setting up ejs
 app.set("view engine", "ejs");
@@ -42,8 +52,7 @@ app.use((req, _, next) => {
     next();
 });
 
-app.use("/", PageRoutes); //This tells Express to use the routes defined in pageRoutes for requests with URLs starting with /
-app.use("/cards", CardRoutes);
+RoutesSetup();
 
 //There can only be one middleware in your application can look like this
 app.use((error, _, response, __) => {
