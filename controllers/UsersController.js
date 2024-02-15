@@ -97,6 +97,8 @@ export const create = async (req, res, next) => {
             user.avatar = avatar.filename;
         }
 
+        //This register function is built in the mongoose and passcode i.e a plugin gives us a registration function 
+        //This registration function will be responsible for taking the password, and converting it to a hash, adding a salt key for extra protection and storing that information in the database
         await User.register(user, password);
 
         res.redirect("/users");
@@ -138,6 +140,7 @@ export const update = async (req, res, next) => {
 
         if (password) {
             user.setPassword(password);
+            //Set password function is a passport method that is provided to the user model i.e responsible for updating the password, fixing the hash, regening the salt and then we save that information
         }
 
         user.save();

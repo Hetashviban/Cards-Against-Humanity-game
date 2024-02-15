@@ -38,7 +38,9 @@ PassportSetup(app); //This function sets up passport with all its strategies (lo
 
 //Setting up ejs
 app.set("view engine", "ejs");
+
 app.use(express.static("public"));
+app.use(express.static("avatars"))
 
 app.use(express.json());//parameters and body parameters are turn into JSON objects making it easier to use
 app.use(express.urlencoded({ extended: true })); //encoding the data so we can read it on server side
@@ -52,7 +54,7 @@ app.use((req, _, next) => {
     next();
 });
 
-RoutesSetup();
+RoutesSetup(app);
 
 //There can only be one middleware in your application can look like this
 app.use((error, _, response, __) => {
