@@ -1,13 +1,14 @@
 import multer from "multer";
-import crypto from 'crypto';
+import crypto from "crypto";
 import { Router } from "express";
-import {index, show, add, edit, create, update, remove} from '../controllers/UsersController.js'
+import { index, show, add, edit, create, update, remove } from "../controllers/UsersController.js";
+import { isAuthenticated, isRole } from "../controllers/AuthenticationController.js";
 
 // Create an instance of the Express Router
 const router = Router();
 
 // Configure Multer for file uploads
-const tempStorageLocation = "temp"; // Temporary storage of images until they are uploaded to the final location 
+const tempStorageLocation = process.env.TEMP_FILE_STORAGE || "temp";
 
 // Create a storage engine for Multer that defines how and where files should be stored
 const storage = multer.diskStorage({
@@ -18,7 +19,7 @@ const storage = multer.diskStorage({
     },
     
     // Filename function defines how uploaded files should be named
-    filename: (_, file, callback) => {
+    filename: (req, file, callback) => {
         // Generate a unique filename for each uploaded file to prevent conflicts
         // Here, we combine a random hexadecimal key with the original filename
         const filename = `${generateRandomHexKey()}-${file.originalname}`;
@@ -27,25 +28,43 @@ const storage = multer.diskStorage({
 });
 
 // Create a Multer instance with the defined storage engine
-const upload = multer({storage});
+export const upload = multer({ storage });
 
 // Define routes and associate them with controller actions
 // These routes are used for user management and access control
 
-router.get("/", index)
-router.get("/new", add)
-router.get("/:id", show)
-router.get("/:id/edit", edit)
-router.post("/:id", upload.single("avatar"), create);
-router.post("/:id", (req, _, next) => {
-    req.method = "put";
-    next();
-})
-router.put("/:id", upload.single("avatar"), update)
-router.delete("/:id", remove)
+// Route to display a list of users (admin access only)
+router.get("/", isAuthenticated, isRole("ADMIN"), index);
 
+// Route to display the user registration page
+router.get("/new", add);
+
+// Route to display a user's profile page
+router.get("/:id", isAuthenticated, show);
+
+// Route to display the user editing page
+router.get("/:id/edit", isAuthenticated, edit);
+
+// Route to create a new user
+router.post("/", (req, _, next) => {
+    next();
+}, upload.single("avatar"), create);
+
+// Handle issue with multipart forms not having detectable fields unless they've gone through multer
+router.post("/:id", (req, res, next) => {
+    req.method = "put"; // Correct the HTTP method for PUT requests
+    next();
+});
+
+// Route to update an existing user's information
+router.put("/:id", isAuthenticated, upload.single("avatar"), update);
+
+// Route to delete an existing user (admin access only)
+router.delete("/:id", isAuthenticated, isRole("ADMIN"), remove);
+
+// Function to generate a random hexadecimal key
 function generateRandomHexKey() {
-    return crypto.randomBytes(4).toString("hex");
+    return crypto.randomBytes(8 / 2).toString("hex");
 }
 
 export default router;
