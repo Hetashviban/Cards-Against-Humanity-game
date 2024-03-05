@@ -34,6 +34,14 @@ app.use(session({
     }
 }));
 
+// Set and clear session notification values
+app.use((req, res, next) => {
+    res.locals.notifications = req.session?.notifications;
+    delete req.session.notifications;
+
+    next();
+});
+
 PassportSetup(app); //This function sets up passport with all its strategies (local signup & login)
 
 //Setting up ejs
@@ -57,7 +65,8 @@ app.use((req, _, next) => {
 RoutesSetup(app);
 
 //There can only be one middleware in your application can look like this
-app.use((error, _, response, __) => {
+//Error Handler
+app.use((error, req, res, __) => {
     if (typeof error === "string") {
         error = new Error(error); //creating a new error object
     }
@@ -66,9 +75,24 @@ app.use((error, _, response, __) => {
 
     console.error(error);
 
-    //We don't want our end user to see the stack trace if there is an error because it is security concern/vulnerability
-    //Hence we will send just the error message
-    response.status(error.status).send(error.message);
+    res.format({
+        "text/html": () => {
+            if (req.session) {
+                req.session.notifications = [
+                    { alertType: "alert-danger", message: error.message }
+                ];
+            }
+            // Outputs the error to the user
+            res.status(error.status).send(error.message);
+        },
+        "application/json": () => {
+            res.status(error.status)
+                .json({ status: error.status, message: error.message });
+        },
+        default: () => {
+            res.status(406).send("NOT APPLICABLE");
+        }
+    });
 });
 
 //app.use((error, req, res, next) => {});

@@ -4,9 +4,19 @@ const cardTypes = Card.schema.path("type").enumValues;
 
 export const index = async (req, res, next) => {
     try {
-        const cards = await Card.find();
+        const cards = await Card.find().populate("author");
 
-        res.render("cards/index", { cards, title: "Cards List" });
+        res.format({
+            "text/html": () => {
+                res.render("cards/index", { cards, title: "Cards List" });
+            },
+            "application/json": () => {
+                res.json({ cards });
+            },
+            default: () => {
+                res.status(406).send("NOT ACCEPTABLE");
+            }
+        });
     } catch(error) {
         next(error);
     }
@@ -21,7 +31,18 @@ export const show = async (req, res, next) => {
             throw new Error("Card does not exist");
         }
 
-        res.render("cards/show", { card, title: "Card View" });
+        res.format({
+            "text/html": () => {
+                res.render("cards/show", { card, title: "Card View" });
+            },
+            "application/json": () => {
+                res.json({ card });
+            },
+            default: () => {
+                res.status(406).send("NOT ACCEPTABLE");
+            }
+        });
+        
     } catch(error) {
         next(error);
     }

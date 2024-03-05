@@ -46,9 +46,7 @@ router.get("/:id", isAuthenticated, show);
 router.get("/:id/edit", isAuthenticated, edit);
 
 // Route to create a new user
-router.post("/", (req, _, next) => {
-    next();
-}, upload.single("avatar"), create);
+router.post("/", upload.single("avatar"), create);
 
 // Handle issue with multipart forms not having detectable fields unless they've gone through multer
 router.post("/:id", (req, res, next) => {
@@ -63,8 +61,8 @@ router.put("/:id", isAuthenticated, upload.single("avatar"), update);
 router.delete("/:id", isAuthenticated, isRole("ADMIN"), remove);
 
 // Function to generate a random hexadecimal key
-function generateRandomHexKey() {
-    return crypto.randomBytes(8 / 2).toString("hex");
+export function generateRandomHexKey(length = 8) {
+    return crypto.randomBytes(length / 2).toString("hex");
 }
 
 export default router;

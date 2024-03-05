@@ -14,4 +14,6 @@ const CardSchema = new mongoose.Schema({
     },
 }, { timestamps: true });
 
+// the timestamps option is a schema option that, when set to true, automatically adds two fields to the schema: createdAt and updatedAt. These fields are automatically managed by Mongoose and are used to track the creation and last update times of documents in a collection.
+
 export default mongoose.model("Card", CardSchema);

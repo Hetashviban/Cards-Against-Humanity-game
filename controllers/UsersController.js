@@ -1,6 +1,11 @@
 import User from "../models/User.js";
 import fs from "fs";
 
+const permanentStorage = "avatars";
+const sleep = async (lengthInMS) => {
+    await new Promise(resolve => setTimeout(resolve, lengthInMS));
+};
+
 // Helpers
 async function findAndVerifyUser(req) {
     const user = await User.findById(req.params.id);
@@ -92,7 +97,8 @@ export const create = async (req, res, next) => {
         }
 
         if (avatar && fs.existsSync(avatar.path)) {
-            fs.copyFileSync(avatar.path, `avatars/${avatar.filename}`);
+            fs.copyFileSync(avatar.path, `${permanentStorage}/${avatar.filename}`);
+            await sleep(500); // Give the file system some time to write the image before we set it on the user object
             fs.unlinkSync(avatar.path);
             user.avatar = avatar.filename;
         }
@@ -132,9 +138,10 @@ export const update = async (req, res, next) => {
         }
 
         if (avatar && fs.existsSync(avatar.path)) {
-            fs.copyFileSync(avatar.path, `avatars/${avatar.filename}`);
+            fs.copyFileSync(avatar.path, `${permanentStorage}/${avatar.filename}`);
+            await sleep(500); 
             fs.unlinkSync(avatar.path);
-            fs.unlinkSync(`avatars/${user.avatar}`);
+            fs.unlinkSync(`${permanentStorage}/${user.avatar}`);
             user.avatar = avatar.filename;
         }
 
@@ -154,7 +161,7 @@ export const update = async (req, res, next) => {
 export const remove = async (req, res, next) => {
     try {
         const user = await findAndVerifyUser(req);
-        const filepath = `avatars/${user.avatar}`;
+        const filepath = `${permanentStorage}/${user.avatar}`;
 
         if (fs.existsSync(filepath)) {
             fs.unlinkSync(filepath);
