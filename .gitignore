@@ -1,5 +1,8 @@
 node_modules
-package-lock.json
 JS Frameworks.txt
 Restful API.png
 .env
+temp/*
+!temp/.gitkeep
+avatars/*
+!avatars/.gitkeep

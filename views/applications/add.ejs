@@ -2,14 +2,14 @@
 
 <div class="container mt-5">
     <h1>
-        Create New Application Credentials
+        <%= formType === "create" ? "Create New Application" : "Update Application" %>
     </h1>
 
     <hr class="my-5">
 
     <%- include("./_form") %>
 
-    <a href="/cards">Back to cards</a>
+    <a href="/applications">Back to applications</a>
 </div>
 
 <%- include("../shared/_footer") %>

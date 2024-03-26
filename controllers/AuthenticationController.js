@@ -3,34 +3,52 @@ import passport from "passport";
 // Render the login page
 export const login = (_, res) => {
     res.render("authentication/login");
-}
+};
 
 // Authenticate user using Passport's local strategy
 export const authenticate = async (req, res, next) => {
     // Passport's authentication middleware for local strategy is invoked with options.
-    passport.authenticate("local", {
-        successRedirect: "/", // Redirect on successful authentication
-        failureRedirect: "/login", // Redirect on failed authentication
-    }, (error, user) => {
-        if (error) {
-            req.session.notifications = [{ alertType: "alert-danger", message: "Issue with logging in" }];
-            return next(error);
+    passport.authenticate(
+        "local", 
+        {
+            successRedirect: "/", // Redirect on successful authentication
+            failureRedirect: "/login", // Redirect on failed authentication
+        },
+        (error, user) => {
+            if (error) {
+                req.session.notifications = [{ alertType: "alert-danger", message: "Issue with logging in" }];
+                return next(error);
+            }
+
+            if (!user) {
+                req.session.notifications = [{ alertType: "alert-danger", message: "Issue with logging in" }];
+                return res.format({
+                    "text/html": () => res.redirect("/login"),
+                    "application/json": () => res.status(401).json({ status: 401, message: "NOT AUTHORIZED" }),
+                    default: () => res.status(406).send("NOT ACCEPTABLE")
+                });
+            }
+
+            req.logIn(user, err => {
+                if (err) return next(err);
+
+                req.session.notifications = [{ alertType: "alert-success", message: "Successfully logged in" }];
+
+                res.format({
+                    "text/html": () => res.redirect("/"),
+                    "application/json": () => res.status(200).json({ status: 200, message: "SUCCESS", user: {
+                        id: user.id,
+                        firstName: user.firstName,
+                        lastName: user.lastName,
+                        nickname: user.nickname,
+                        email: user.email
+                    } }),
+                    default: () => res.status(406).send("NOT ACCEPTABLE")
+                });
+            });
         }
-
-        if (!user) {
-            req.session.notifications = [{ alertType: "alert-danger", message: "Issue with logging in" }];
-            return res.redirect("/login");
-        }
-
-        req.logIn(user, (err) => {
-            if (err) return next(err);
-            
-            req.session.notifications = [{ alertType: "alert-success", message: "Successfully logged in" }];
-
-            return res.redirect("/");
-        });
-    })(req, res, next); // Invoke Passport middleware with request, response, and next middleware function
-};
+    )(req, res, next); // Invoke Passport middleware with request, response, and next middleware function
+}
 
 // Logout user, destroy session, and clear cookies
 export const logout = (req, res, next) => {
@@ -52,7 +70,7 @@ export const logout = (req, res, next) => {
 };
 
 // Check if the user is authenticated, and redirect to login if not
-export const isAuthenticated = (req, res, next) => {    
+export const isAuthenticated = (req, res, next) => {
     if (req.isAuthenticated()) return next(); // Proceed if authenticated
 
     res.redirect("/login"); // Redirect to login page if not authenticated
@@ -72,7 +90,7 @@ export const isRole = (role) => {
 
             return next(new Error("FORBIDDEN")); // Return an error for forbidden access
         }
-        
+
         next(); // Proceed if user has the correct role
-    }
-}
+    };
+};

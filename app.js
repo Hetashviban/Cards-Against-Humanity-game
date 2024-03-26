@@ -4,12 +4,18 @@ import RoutesSetup from "./lib/RoutesSetup.js";
 import MongooseSetup from "./lib/MongooseSetup.js";
 import PassportSetup from "./lib/PassportSetup.js";
 import session from "express-session";
+import cors from "cors"
 
 dotenv.config();
-
-MongooseSetup()
-
 const app = express();
+
+// This sets up CORS policy
+const corsOptions = {
+    origin: process.env.CORS_ORIGIN,
+    credentials: true
+};
+app.use(cors(corsOptions));
+
 //We need to assign the environment variable to a normal variable in our application
 //process is an object that provides information about, and control over, the current Node.js process.
 // process.env - An object containing the user environment
@@ -35,12 +41,15 @@ app.use(session({
 }));
 
 // Set and clear session notification values
+// Clear session temp values
 app.use((req, res, next) => {
     res.locals.notifications = req.session?.notifications;
-    delete req.session.notifications;
+    if (req.session.notifications) delete req.session.notifications;
 
     next();
 });
+
+MongooseSetup()
 
 PassportSetup(app); //This function sets up passport with all its strategies (local signup & login)
 

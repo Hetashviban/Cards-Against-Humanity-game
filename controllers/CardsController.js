@@ -4,7 +4,7 @@ const cardTypes = Card.schema.path("type").enumValues;
 
 export const index = async (req, res, next) => {
     try {
-        const cards = await Card.find().populate("author");
+        const cards = await Card.find();
 
         res.format({
             "text/html": () => {

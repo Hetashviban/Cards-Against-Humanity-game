@@ -41,15 +41,28 @@ export const index = async (req, res, next) => {
     }
 };
 
+// Function to display a User's profile (admin access only)
 export const show = async (req, res, next) => {
     try {
+        // Find and verify a user based on the provided request parameters
         const user = await findAndVerifyUser(req);
 
-        res.render("users/show", {
-            user,
-            title: "User View"
+        // Render the user's profile page with the retrieved user data
+        res.format({
+            "text/html": () => res.render("users/show", {
+                user,
+                title: "User View",
+            }),
+            "application/json": () => res.status(200).json({ status: 200, message: "SUCCESS", user: {
+                id: user.id,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                nickname: user.nickname,
+                email: user.email
+            } }),
+            default: () => res.status(406).send("NOT ACCEPTABLE")
         });
-    } catch(error) {
+    } catch (error) {
         next(error);
     }
 };
